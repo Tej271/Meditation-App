@@ -1,7 +1,7 @@
 const song = document.querySelector(".song");
 const play = document.querySelector(".play");
 const replay = document.querySelector(".replay");
-const outline = document.querySelector(".moving-outline circle");
+const outline = document.querySelector(".track-outline circle");
 const video = document.querySelector(".vid-container video");
 // sounds
 const sounds = document.querySelectorAll(".sound-picker button");
@@ -13,9 +13,16 @@ const timeSelect = document.querySelectorAll(".time-select button");
 let fakeDuration = 600;
 
 outline.style.strokeDashoffset = outlineLength;
-outlinne.style.strokeDasharray = outlineLength;
+outline.style.strokeDasharray = outlineLength;
 //0:00
-timeDisplay.textContent = `${Math.floor(fakeDuration/60)}:${Math.floor(fakeDuration%60)}`;
+timeDisplay.textContent = `${Math.floor(fakeDuration/60).toLocaleString('en-US', {
+    minimumIntegerDigits: 2,
+    useGrouping: false
+  })}:${Math.floor(fakeDuration%60).toLocaleString('en-US', {
+    minimumIntegerDigits: 2,
+    useGrouping: false
+  })
+}`;
 
 sounds.forEach(sound =>{
     sound.addEventListener("click", function(){
@@ -42,7 +49,14 @@ const restartSong = song => {
 timeSelect.forEach(option => {
     option.addEventListener("click",function(){
         fakeDuration = this.getAttribute("data-Time");
-        timeDisplay.textContent = `${Math.floor(fakeDuration/60)}:${Math.floor(fakeDuration%60)}`
+        timeDisplay.textContent = `${Math.floor(fakeDuration/60).toLocaleString('en-US', {
+            minimumIntegerDigits: 2,
+            useGrouping: false
+          })}:${Math.floor(fakeDuration%60).toLocaleString('en-US', {
+            minimumIntegerDigits: 2,
+            useGrouping: false
+          })
+        }`;
     })
 })
 
@@ -59,14 +73,19 @@ const checkPlaying = song => {
     }
 }
 
-song.ontimeupdate = function(){
+song.ontimeupdate = function() {updateTime()};
+
+
+function updateTime(){
     let currentTime = song.currentTime;
     let elapsed = fakeDuration - currentTime;
     let seconds = Math.floor(elapsed%60);
     let minutes = Math.floor(elapsed/60);
-    timeDisplay.textContent `${minutes}:${seconds}`;
+    timeDisplay.textContent = `${minutes}:${seconds}`;
     let progress = outlineLength - (currentTime/fakeDuration) * outlineLength;
-    online.style.strokeDashoffset = progress;
+    console.log(progress);
+    outline.style.strokeDashoffset = progress;
+    outline.style.strokeDasharray = outlineLength-progress;
 
     if(currentTime >= fakeDuration){
         song.pause();
